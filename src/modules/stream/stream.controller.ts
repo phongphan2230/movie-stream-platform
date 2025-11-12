@@ -6,8 +6,7 @@ export class StreamController {
   constructor(private readonly streamService: StreamService) {}
 
   @Get()
-  getHello(): Promise<void> {
-    const stream = this.streamService.sendViewEvent('1', '1');
-    return stream;
+  getHello(): string {
+    return "abc";
   }
 }
