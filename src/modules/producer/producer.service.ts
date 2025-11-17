@@ -2,14 +2,14 @@ import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { Kafka, Producer } from 'kafkajs';
 
 @Injectable()
-export class producerService implements OnModuleInit, OnModuleDestroy {
-  private static instance: producerService;
+export class KafkaProducerService implements OnModuleInit, OnModuleDestroy {
+  private static instance: KafkaProducerService;
   private producer: Producer;
   private kafka: Kafka;
 
   constructor() {
-    if (producerService.instance) {
-      return producerService.instance;
+    if (KafkaProducerService.instance) {
+      return KafkaProducerService.instance;
     }
     this.kafka = new Kafka({
         clientId: process.env.KAFKA_CLIENT_ID || 'movie-stream-producer',
@@ -21,7 +21,7 @@ export class producerService implements OnModuleInit, OnModuleDestroy {
         }
     });
 
-    producerService.instance = this;
+    KafkaProducerService.instance = this;
   }
 
   async onModuleInit() {

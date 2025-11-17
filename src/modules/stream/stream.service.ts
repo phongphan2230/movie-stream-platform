@@ -1,6 +1,6 @@
 import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { Kafka, Producer } from 'kafkajs';
-import { producerService } from './main';
+import { producerService } from '../producer/producer.service';
 
 @Injectable()
 export class StreamService {
