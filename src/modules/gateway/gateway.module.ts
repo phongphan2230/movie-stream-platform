@@ -6,5 +6,6 @@ import { GatewayService } from './gateway.service';
   imports: [],
   controllers: [GatewayController],
   providers: [GatewayService],
+  exports: [GatewayService],
 })
 export class GatewayModule {}

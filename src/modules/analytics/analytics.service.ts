@@ -2,7 +2,7 @@ import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { Counter, register } from 'prom-client';
 import { Consumer } from 'kafkajs';
 import * as client from 'prom-client';
-import { producerService } from '../producer/producer.service';
+import { KafkaProducerService } from '../kafka/producer/kafka-producer.service';
 
 @Injectable()
 export class AnalyticsService implements OnModuleInit {
@@ -11,7 +11,7 @@ export class AnalyticsService implements OnModuleInit {
 
   private consumer: Consumer;
 
-  constructor(private readonly kafkaService: producerService) {
+  constructor(private readonly kafkaService: KafkaProducerService) {
     client.collectDefaultMetrics();
     this.requestCouter = new client.Counter({
       name: 'http_requests_total',
@@ -27,44 +27,44 @@ export class AnalyticsService implements OnModuleInit {
   }
 
   async onModuleInit() {
-    this.consumer = this.kafkaService.createConsumer('analytics-group');
+    // this.consumer = this.kafkaService.createConsumer('analytics-group');
     
-    this.consumer.on(this.consumer.events.CRASH, ({ payload: { error } }) => {
-      console.error('Kafka consumer crashed:', error);
-      setTimeout(() => this.onModuleInit(), 5000);
-    });
+    // this.consumer.on(this.consumer.events.CRASH, ({ payload: { error } }) => {
+    //   console.error('Kafka consumer crashed:', error);
+    //   setTimeout(() => this.onModuleInit(), 5000);
+    // });
 
-    try {
-      await this.consumer.connect();
-      await this.consumer.subscribe({ topic: 'movie-views', fromBeginning: true });
+    // try {
+    //   await this.consumer.connect();
+    //   await this.consumer.subscribe({ topic: 'movie-views', fromBeginning: true });
 
-      await this.consumer.run({
-        eachMessage: async ({ message }) => {
-          try {
-            if (!message.value) {
-              console.warn('Received message with null value');
-              return;
-            }
+    //   await this.consumer.run({
+    //     eachMessage: async ({ message }) => {
+    //       try {
+    //         if (!message.value) {
+    //           console.warn('Received message with null value');
+    //           return;
+    //         }
 
-            const messageData = JSON.parse(message.value.toString()) as {
-              movieId: string;
-              userId: string;
-              timestamp: number;
-            };
+    //         const messageData = JSON.parse(message.value.toString()) as {
+    //           movieId: string;
+    //           userId: string;
+    //           timestamp: number;
+    //         };
 
-            if (messageData.movieId) {
-              this.requestCouter.inc({ method: 'GET', path: '/movie-views' });
-              this.responseTimeHistogram.observe({ method: 'GET', path: '/movie-views' }, 0.1);
-            }
-          } catch (error) {
-            console.error('Error processing message:', error);
-          }
-        },
-      });
-    } catch (error) {
-      console.error('Failed to start consumer:', error);
-      setTimeout(() => this.onModuleInit(), 5000);
-    }
+    //         if (messageData.movieId) {
+    //           this.requestCouter.inc({ method: 'GET', path: '/movie-views' });
+    //           this.responseTimeHistogram.observe({ method: 'GET', path: '/movie-views' }, 0.1);
+    //         }
+    //       } catch (error) {
+    //         console.error('Error processing message:', error);
+    //       }
+    //     },
+    //   });
+    // } catch (error) {
+    //   console.error('Failed to start consumer:', error);
+    //   setTimeout(() => this.onModuleInit(), 5000);
+    // }
   }
   incrementRequest(method: string, route: string, status: string) {
     this.requestCouter.inc({ method, route, status });
