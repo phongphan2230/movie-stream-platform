@@ -1,11 +1,13 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { KafkaConsumerService } from '../kafka/consumer/kafka-consumer-index.service';
 
 @Injectable()
 export class MovieService {
   constructor(
-    private readonly KafkaConsumerService: KafkaConsumerService
+    @Inject('MOVIE_CONSUMER')
+    private readonly kafkaConsumerService: KafkaConsumerService  // Đổi tên biến thành dạng camelCase
   ) {}
+
   getHello(): string {
     return 'Hello World!';
   }

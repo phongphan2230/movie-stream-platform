@@ -1,18 +1,33 @@
-import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
+// src/modules/kafka/consumer/movie/movie.consumer.ts
+import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { KafkaConsumerService } from '../kafka-consumer-index.service';
 
 @Injectable()
-export class MovieConsumerService implements OnModuleInit, OnModuleDestroy {
-  constructor(private readonly consumer: KafkaConsumerService) {}
+export class MovieConsumer implements OnModuleInit {
+  constructor(
+    @Inject('MOVIE_CONSUMER')
+    private readonly kafkaConsumer: KafkaConsumerService
+  ) {}
 
   async onModuleInit() {
-    await this.consumer.subscribe(async ({ message }) => {
+    await this.kafkaConsumer.subscribe(async (payload) => {
+      const { topic, partition, message } = payload;
       const value = message.value?.toString();
-      console.log('🎬 Movie view event received:', value);
+
+      // Process the movie event here
+      if (value) {
+        try {
+          const eventData = JSON.parse(value);
+          await this.processMovieEvent(eventData);
+        } catch (error) {
+          console.error('Error parsing movie event:', error);
+        }
+      }
     });
   }
 
-  async onModuleDestroy() {
-    await this.consumer.disconnect();
+  private async processMovieEvent(event: any) {
+    console.log('Processing movie event:', event);
+    // Add your movie processing logic here
   }
 }

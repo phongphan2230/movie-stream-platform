@@ -8,14 +8,19 @@ export class KafkaConsumerIndexModule {
   static register(): DynamicModule {
     return {
       module: KafkaConsumerIndexModule,
-      imports: [MovieConsumerModule.register()],
       providers: [
-        KafkaConsumerService, 
+        {
+          provide: 'KAFKA_CONSUMER_OPTIONS',
+          useValue: {
+            clientId: 'default-client',
+            groupId: 'default-group',
+            brokers: ['localhost:9092'],
+            topic: 'default-topic'
+          }
+        },
+        KafkaConsumerService
       ],
-      exports: [
-        KafkaConsumerService,
-        MovieConsumerModule.register(), 
-      ],
+      exports: [KafkaConsumerService],
     };
   }
 }
