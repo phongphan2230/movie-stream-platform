@@ -1,14 +1,14 @@
 import { Module } from '@nestjs/common';
 import { MovieController } from './movie.controller';
 import { MovieService } from './movie.service';
-import { MovieConsumerModule } from '../kafka/consumer/movie/kafka-consumer-movie.module';
-import { KafkaConsumerIndexModule } from '../kafka/consumer/kafka-consumer-index.module';
 
+/**
+ * Movie Module
+ * Note: Consumers are imported at App Module level via KafkaConsumerIndexModule
+ * This module only needs to use KafkaProducerService (which is @Global)
+ */
 @Module({
-  imports: [
-    // KafkaConsumerIndexModule,
-    MovieConsumerModule.register(),
-  ],
+  imports: [],
   controllers: [MovieController],
   providers: [MovieService],
   exports: [MovieService],

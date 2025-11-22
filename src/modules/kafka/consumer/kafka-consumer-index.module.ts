@@ -1,26 +1,21 @@
-import { Module, Global, DynamicModule } from '@nestjs/common';
-import { KafkaConsumerService } from './kafka-consumer-index.service';
+import { Module, Global } from '@nestjs/common';
 import { MovieConsumerModule } from './movie/kafka-consumer-movie.module';
+import { AnalyticsConsumerModule } from './analytics/kafka-consumer-analytics.module';
 
+/**
+ * Kafka Consumer Index Module
+ * Aggregates all consumer modules
+ */
 @Global()
-@Module({})
-export class KafkaConsumerIndexModule {
-  static register(): DynamicModule {
-    return {
-      module: KafkaConsumerIndexModule,
-      providers: [
-        {
-          provide: 'KAFKA_CONSUMER_OPTIONS',
-          useValue: {
-            clientId: 'default-client',
-            groupId: 'default-group',
-            brokers: ['localhost:9092'],
-            topic: 'default-topic'
-          }
-        },
-        KafkaConsumerService
-      ],
-      exports: [KafkaConsumerService],
-    };
-  }
-}
+@Module({
+  imports: [
+    MovieConsumerModule,
+    AnalyticsConsumerModule,
+    // Add more consumer modules here as needed
+  ],
+  exports: [
+    MovieConsumerModule,
+    AnalyticsConsumerModule,
+  ],
+})
+export class KafkaConsumerIndexModule {}
